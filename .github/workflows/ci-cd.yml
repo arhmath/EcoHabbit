@@ -13,4 +13,4 @@ jobs:
 
       - name: Print Hello World
         run: |
-          echo "Hello World! Pipeline DevOps Aska berhasil jalan."
+          echo "Hello World! Pipeline berhasil jalan."
