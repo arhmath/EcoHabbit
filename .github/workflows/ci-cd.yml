@@ -1,0 +1,16 @@
+name: Test Devops Branch
+
+on:
+  push:
+    branches: [ devops/setup-pipeline ] 
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Print Hello World
+        run: |
+          echo "Hello World! Pipeline DevOps Aska berhasil jalan."
