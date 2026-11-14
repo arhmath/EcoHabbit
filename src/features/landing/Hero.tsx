@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { gsap, useMotion } from '../../lib/motion'
+import { useAuthCta } from '../auth/hooks'
 
 const words = ['Cukup', 'mulai', 'dari', 'satu', 'kebiasaan.']
 
@@ -19,6 +21,7 @@ const deck = [
 export default function Hero() {
   const ref = useRef<HTMLElement>(null)
   const [order, setOrder] = useState([0, 1, 2])
+  const { authed, dashboard } = useAuthCta()
 
   useMotion(ref, () => {
     const tl = gsap.timeline({ paused: true, defaults: { ease: 'power4.out' } })
@@ -48,7 +51,7 @@ export default function Hero() {
         <div className="orb absolute top-1/3 right-0 size-[22rem] rounded-full bg-sage/20 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto grid min-h-screen max-w-6xl items-center gap-12 px-6 pt-32 pb-20 lg:grid-cols-[1fr_1fr]">
+      <div className="relative mx-auto grid min-h-screen max-w-6xl items-center gap-12 px-6 pt-32 pb-32 lg:grid-cols-[1fr_1fr]">
         <div>
           <h1 className="font-display text-5xl leading-[0.95] font-extrabold tracking-tight sm:text-6xl xl:text-7xl">
             {words.map((w) => (
@@ -61,7 +64,7 @@ export default function Hero() {
             EcoHabbit mencatat aksi hijau harianmu, memverifikasinya, lalu mengubahnya jadi XP, level, dan reward.
           </p>
           <div className="intro mt-10 flex flex-wrap gap-4">
-            <a href="#cta" className="rounded-full bg-sage px-7 py-3.5 font-semibold text-ink transition-colors hover:bg-mist">Mulai sekarang</a>
+            <Link to={authed ? dashboard : '/register'} className="rounded-full bg-sage px-7 py-3.5 font-semibold text-ink transition-colors hover:bg-mist">{authed ? 'Ke dashboard' : 'Mulai sekarang'}</Link>
             <a href="#cara" className="rounded-full border border-sage/40 px-7 py-3.5 font-semibold transition-colors hover:bg-forest-800">Lihat cara kerja</a>
           </div>
         </div>

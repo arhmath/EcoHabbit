@@ -5,13 +5,30 @@ import Preloader from './Preloader'
 import Navbar from './Navbar'
 import Hero from './Hero'
 import Hud from './Hud'
+import Tape from './Tape'
 import Features from './Features'
 import Steps from './Steps'
 import Levels from './Levels'
 import Cta from './Cta'
 
+// Preloader cukup sekali per sesi, supaya kembali dari /login tidak menunggu lagi.
+const SEEN_KEY = 'eh.preloaded'
+const seenPreloader = () => {
+  try {
+    return sessionStorage.getItem(SEEN_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 export default function LandingPage() {
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => !seenPreloader())
+
+  useEffect(() => {
+    document.title = 'EcoHabbit | Ubah kebiasaan kecil jadi dunia yang lebih bersih'
+    // Tanpa preloader tidak ada yang mengirim eh:ready, padahal animasi Hero menunggunya.
+    if (!loading) window.dispatchEvent(new Event('eh:ready'))
+  }, [])
 
   useEffect(() => {
     document.fonts.ready.then(() => ScrollTrigger.refresh())
@@ -29,10 +46,32 @@ export default function LandingPage() {
 
   return (
     <div id="top">
-      {loading && <Preloader onDone={() => setLoading(false)} />}
+      {loading && (
+        <Preloader
+          onDone={() => {
+            try {
+              sessionStorage.setItem(SEEN_KEY, '1')
+            } catch {
+              /* abaikan */
+            }
+            setLoading(false)
+          }}
+        />
+      )}
       <Navbar />
       <main>
         <Hero />
+        {/* Garis polisi EcoHabbit: dua pita bersilang di batas hero. */}
+        <div aria-hidden="true" className="relative z-20 h-0 -translate-y-16 overflow-x-clip">
+          <Tape tone="sage" className="absolute -left-[5%] w-[110%] -translate-y-1/2 -rotate-[5deg]" duration={50} />
+          <Tape
+            tone="forest"
+            reverse
+            duration={60}
+            phrases={['AREA PEMILAHAN AKTIF', 'ORGANIK · KERTAS · PLASTIK · KACA · KARDUS', 'JAGA STREAK-MU']}
+            className="absolute -left-[5%] w-[110%] -translate-y-1/2 rotate-[3.5deg]"
+          />
+        </div>
         <Hud />
         <Features />
         <Steps />

@@ -1,3 +1,6 @@
+import { Link } from 'react-router-dom'
+import { useAuthCta } from '../auth/hooks'
+
 const points = [
   'Pilih misi dan tingkat tantangan sesuai levelmu',
   'Foto sampahmu dan lihat hasil pemilahannya',
@@ -6,6 +9,7 @@ const points = [
 ]
 
 export default function Cta() {
+  const { authed, dashboard } = useAuthCta()
   return (
     <section id="cta" className="px-6 pb-28">
       <div className="mx-auto grid max-w-6xl gap-10 rounded-[3rem] bg-mist px-8 py-16 text-ink md:grid-cols-2 md:px-16 md:py-24">
@@ -20,8 +24,14 @@ export default function Cta() {
             ))}
           </ul>
           <div className="mt-10 flex flex-wrap gap-4">
-            <a href="#top" className="rounded-full bg-ink px-7 py-3.5 font-semibold text-mist transition-colors hover:bg-forest-700">Masuk dan mulai</a>
-            <a href="#top" className="rounded-full border border-ink/30 px-7 py-3.5 font-semibold transition-colors hover:bg-sage">Buat akun EcoHabbit</a>
+            {authed ? (
+              <Link to={dashboard} className="rounded-full bg-ink px-7 py-3.5 font-semibold text-mist transition-colors hover:bg-forest-700">Ke dashboard</Link>
+            ) : (
+              <>
+                <Link to="/login" className="rounded-full bg-ink px-7 py-3.5 font-semibold text-mist transition-colors hover:bg-forest-700">Masuk dan mulai</Link>
+                <Link to="/register" className="rounded-full border border-ink/30 px-7 py-3.5 font-semibold transition-colors hover:bg-sage">Buat akun EcoHabbit</Link>
+              </>
+            )}
           </div>
         </div>
       </div>
