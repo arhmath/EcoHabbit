@@ -5,11 +5,12 @@ import Preloader from './Preloader'
 import Navbar from './Navbar'
 import Hero from './Hero'
 import Hud from './Hud'
-import Tape from './Tape'
+import Marquee from './Marquee'
 import Features from './Features'
 import Steps from './Steps'
 import Levels from './Levels'
 import Cta from './Cta'
+import Footer from './Footer'
 
 // Preloader cukup sekali per sesi, supaya kembali dari /login tidak menunggu lagi.
 const SEEN_KEY = 'eh.preloaded'
@@ -45,7 +46,7 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div id="top">
+    <div id="top" className="theme-light min-h-screen bg-paper text-leaf">
       {loading && (
         <Preloader
           onDone={() => {
@@ -61,29 +62,14 @@ export default function LandingPage() {
       <Navbar />
       <main>
         <Hero />
-        {/* Garis polisi EcoHabbit: dua pita bersilang di batas hero. */}
-        <div aria-hidden="true" className="relative z-20 h-0 -translate-y-16 overflow-x-clip">
-          <Tape tone="sage" className="absolute -left-[5%] w-[110%] -translate-y-1/2 -rotate-[5deg]" duration={50} />
-          <Tape
-            tone="forest"
-            reverse
-            duration={60}
-            phrases={['AREA PEMILAHAN AKTIF', 'ORGANIK · KERTAS · PLASTIK · KACA · KARDUS', 'JAGA STREAK-MU']}
-            className="absolute -left-[5%] w-[110%] -translate-y-1/2 rotate-[3.5deg]"
-          />
-        </div>
+        <Marquee />
         <Hud />
         <Features />
         <Steps />
         <Levels />
         <Cta />
       </main>
-      <footer className="overflow-hidden border-t border-sage/20 px-6 pt-12 pb-8 text-center">
-        <p aria-hidden="true" className="font-display text-[clamp(2rem,10vw,7rem)] font-extrabold tracking-[0.3em] text-forest-700">
-          ECOHABBIT
-        </p>
-        <p className="mt-6 text-sm text-mist/60">© {new Date().getFullYear()} EcoHabbit. Capstone Project.</p>
-      </footer>
+      <Footer />
     </div>
   )
 }

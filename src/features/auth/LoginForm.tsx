@@ -31,7 +31,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-5">
       {notice && (
-        <p role="status" className="rounded-2xl border border-forest-700/30 bg-sage/30 px-4 py-3 text-sm">
+        <p role="status" className="rounded-2xl border border-leaf/30 bg-zest-soft px-4 py-3 text-sm">
           {notice}
         </p>
       )}

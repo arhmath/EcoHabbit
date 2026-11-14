@@ -33,16 +33,16 @@ export default function Preloader({ onDone }: { onDone: () => void }) {
   }, [])
 
   return (
-    <div ref={root} className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-ink px-6 text-center">
+    <div ref={root} className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-zest px-6 text-center text-leaf">
       <p aria-label="EcoHabbit" className="font-display text-3xl font-extrabold tracking-[0.4em] sm:text-5xl">
         {'ECOHABBIT'.split('').map((c, i) => (
           <span key={i} aria-hidden="true" className="pl-letter inline-block">{c}</span>
         ))}
       </p>
-      <p className="text-sm text-mist/60">Menumbuhkan kebiasaan hijau, satu aksi sehari</p>
-      <div className="h-px w-48 bg-forest-700"><div className="pl-bar h-px origin-left bg-sage" /></div>
+      <p className="text-sm text-leaf/70">Menumbuhkan kebiasaan hijau, satu aksi sehari</p>
+      <div className="h-1.5 w-48 overflow-hidden rounded-full bg-leaf/25"><div className="pl-bar h-1.5 origin-left rounded-full bg-leaf" /></div>
       <p className="font-display text-2xl font-bold tabular-nums"><span ref={count}>0</span>%</p>
-      <button onClick={() => tl.current?.timeScale(6)} className="absolute right-6 bottom-6 text-sm text-mist/60 hover:text-mist">
+      <button onClick={() => tl.current?.timeScale(6)} className="absolute right-6 bottom-6 text-sm text-leaf/70 hover:text-leaf">
         Lewati
       </button>
     </div>

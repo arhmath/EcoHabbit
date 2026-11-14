@@ -41,23 +41,23 @@ export default function Navbar() {
   return (
     <header
       ref={ref}
-      className="fixed inset-x-0 top-4 z-50 mx-auto flex w-[min(92%,64rem)] items-center justify-between rounded-full border border-sage/20 bg-ink/60 px-5 py-3 backdrop-blur-xl"
+      className="fixed inset-x-0 top-4 z-50 mx-auto flex w-[min(92%,64rem)] items-center justify-between rounded-full border-2 border-leaf bg-white/85 px-5 py-3 text-leaf backdrop-blur-xl"
     >
       <Logo />
       <nav aria-label="Navigasi utama" className="hidden gap-8 text-sm md:flex">
         {links.map(([label, href]) =>
           href.startsWith('/') ? (
-            <Link key={href} to={href} className="text-mist/70 transition-colors hover:text-mist">
+            <Link key={href} to={href} className="text-leaf/70 transition-colors hover:text-leaf">
               {label}
             </Link>
           ) : (
-            <a key={href} href={href} className="text-mist/70 transition-colors hover:text-mist">
+            <a key={href} href={href} className="text-leaf/70 transition-colors hover:text-leaf">
               {label}
             </a>
           ),
         )}
       </nav>
-      <Link to={authed ? dashboard : '/register'} className="rounded-full bg-sage px-5 py-2 text-sm font-semibold text-ink transition-colors hover:bg-mist">
+      <Link to={authed ? dashboard : '/register'} className="rounded-full bg-leaf px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-leaf-600">
         {authed ? 'Dashboard' : 'Daftar'}
       </Link>
     </header>

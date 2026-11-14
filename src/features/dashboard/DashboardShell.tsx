@@ -14,7 +14,7 @@ export default function DashboardShell({ title, note }: { title: string; note: s
         <h2 className="mt-8 font-display text-2xl font-semibold">{title}</h2>
         <p className="mt-2 text-mist/70">{note}</p>
         <div className="mt-10 max-w-48">
-          <Button onClick={() => void logout()} className="bg-sage text-ink hover:bg-mist">
+          <Button onClick={() => void logout()} className="border-sage bg-sage text-ink! hover:bg-mist">
             Keluar
           </Button>
         </div>

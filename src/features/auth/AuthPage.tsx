@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { gsap, useMotion } from '../../lib/motion'
 import { Logo } from '../landing/Navbar'
-import Tape from '../landing/Tape'
 import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
 
@@ -22,17 +21,19 @@ export default function AuthPage() {
   })
 
   return (
-    <div ref={ref} className="relative flex min-h-screen items-center justify-center overflow-hidden bg-linear-to-b from-ink to-forest-900 px-4 py-10 text-ink">
+    <div ref={ref} className="relative flex min-h-screen items-center justify-center overflow-hidden bg-paper px-4 py-10 text-leaf">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="orb absolute -top-24 -left-24 size-[28rem] rounded-full bg-forest-700/50 blur-3xl" />
-        <div className="orb absolute right-0 bottom-0 size-[22rem] rounded-full bg-sage/20 blur-3xl" />
+        <div className="orb absolute -top-28 -left-28 size-[26rem] rounded-full bg-zest" />
+        <div className="orb absolute -right-24 bottom-0 size-80 rounded-full bg-leaf" />
+        <div className="orb absolute top-1/3 right-[12%] size-20 rounded-full border-2 border-leaf bg-white" />
       </div>
 
-      <div className="auth-card relative grid w-full max-w-5xl overflow-hidden rounded-[2rem] border border-sage/20 bg-mist shadow-2xl shadow-black/50 md:min-h-[40rem] md:grid-cols-2">
+      <div className="auth-card relative grid w-full max-w-5xl overflow-hidden rounded-[2rem] border-2 border-leaf bg-white shadow-[12px_12px_0_0_var(--color-leaf)] md:min-h-[40rem] md:grid-cols-2">
         {/* Header merek untuk layar kecil (overlay hanya tampil di md ke atas). */}
-        <div className="relative overflow-hidden bg-linear-to-br from-forest-800 to-ink px-6 pt-6 pb-20 text-mist md:hidden">
+        <div className="relative overflow-hidden bg-leaf px-6 pt-6 pb-16 text-white md:hidden">
           <Logo href="/" />
-          <Tape className="absolute inset-x-[-6%] bottom-3 -rotate-3" duration={35} />
+          <div aria-hidden="true" className="absolute -right-8 -bottom-10 size-32 rounded-full bg-zest" />
+          <div aria-hidden="true" className="absolute right-20 -bottom-6 size-14 rounded-full bg-leaf-600" />
         </div>
 
         <section
@@ -43,11 +44,11 @@ export default function AuthPage() {
           <h1 id="login-title" className="font-display text-4xl font-extrabold tracking-tight">
             Selamat datang
           </h1>
-          <p className="mt-2 mb-8 text-ink/70">Silakan masuk ke akun EcoHabbit kamu.</p>
+          <p className="mt-2 mb-8 text-leaf/70">Silakan masuk ke akun EcoHabbit kamu.</p>
           <LoginForm />
-          <p className="mt-6 text-sm text-ink/70 md:hidden">
+          <p className="mt-6 text-sm text-leaf/70 md:hidden">
             Belum punya akun?{' '}
-            <Link to="/register" className="font-semibold text-ink underline underline-offset-4">
+            <Link to="/register" className="font-semibold text-leaf underline underline-offset-4">
               Daftar
             </Link>
           </p>
@@ -62,11 +63,11 @@ export default function AuthPage() {
           <h1 id="register-title" className="font-display text-4xl font-extrabold tracking-tight">
             Buat akun EcoHabbit
           </h1>
-          <p className="mt-2 mb-8 text-ink/70">Daftar dan mulai tumbuhkan kebiasaan hijaumu.</p>
+          <p className="mt-2 mb-8 text-leaf/70">Daftar dan mulai tumbuhkan kebiasaan hijaumu.</p>
           <RegisterForm />
-          <p className="mt-6 text-sm text-ink/70 md:hidden">
+          <p className="mt-6 text-sm text-leaf/70 md:hidden">
             Sudah punya akun?{' '}
-            <Link to="/login" className="font-semibold text-ink underline underline-offset-4">
+            <Link to="/login" className="font-semibold text-leaf underline underline-offset-4">
               Masuk
             </Link>
           </p>
@@ -75,11 +76,13 @@ export default function AuthPage() {
 
         {/* Overlay geser (desktop). Menutupi sisi yang tidak sedang dipakai. */}
         <aside
-          className={`absolute inset-y-0 left-0 hidden w-1/2 overflow-hidden bg-linear-to-br from-forest-800 to-ink text-mist transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.18,1)] motion-reduce:transition-none md:block ${
+          className={`absolute inset-y-0 left-0 hidden w-1/2 overflow-hidden bg-leaf text-white transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.18,1)] motion-reduce:transition-none md:block ${
             isRegister ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          <div aria-hidden="true" className="pointer-events-none absolute -top-20 -right-20 size-72 rounded-full bg-forest-700/60 blur-3xl" />
+          <div aria-hidden="true" className="pointer-events-none absolute -top-20 -right-20 size-72 rounded-full bg-leaf-600" />
+          <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 -left-16 size-72 rounded-full bg-zest" />
+          <div aria-hidden="true" className="pointer-events-none absolute right-16 bottom-40 size-16 rounded-full border-2 border-zest" />
           <Panel
             active={!isRegister}
             title="Mulai dari satu kebiasaan."
@@ -94,8 +97,6 @@ export default function AuthPage() {
             to="/login"
             cta="Masuk"
           />
-          <Tape tone="sage" className="absolute inset-x-[-12%] bottom-24 -rotate-6" duration={40} />
-          <Tape tone="forest" reverse className="absolute inset-x-[-12%] bottom-24 rotate-3" duration={50} />
         </aside>
       </div>
     </div>
@@ -111,8 +112,8 @@ function Panel({ active, title, body, to, cta }: { active: boolean; title: strin
     >
       <Logo href="/" />
       <h2 className="mt-6 max-w-xs font-display text-4xl leading-[1.05] font-extrabold tracking-tight">{title}</h2>
-      <p className="max-w-xs text-mist/75">{body}</p>
-      <Link to={to} className="relative z-10 rounded-full border border-sage/50 px-7 py-3 font-semibold transition-colors hover:bg-sage hover:text-ink">
+      <p className="max-w-xs text-white/75">{body}</p>
+      <Link to={to} className="relative z-10 rounded-full border-2 border-zest px-7 py-3 font-semibold text-zest transition-colors hover:bg-zest hover:text-leaf">
         {cta}
       </Link>
     </div>
@@ -121,7 +122,7 @@ function Panel({ active, title, body, to, cta }: { active: boolean; title: strin
 
 function BackHome() {
   return (
-    <Link to="/" className="mt-4 inline-block w-fit text-sm font-semibold text-forest-700 hover:text-ink">
+    <Link to="/" className="mt-4 inline-block w-fit text-sm font-semibold text-leaf-600 hover:text-leaf">
       ← Kembali ke halaman utama
     </Link>
   )

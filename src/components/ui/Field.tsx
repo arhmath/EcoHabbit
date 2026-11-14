@@ -31,8 +31,8 @@ export default function Field({ label, error, type = 'text', className = '', ...
           type={isPassword && shown ? 'text' : type}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-err` : undefined}
-          className={`h-12 w-full rounded-2xl border bg-white/70 px-4 text-ink transition-colors placeholder:text-ink/60 focus:border-forest-700 focus:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-700/40 ${
-            error ? 'border-red-700' : 'border-forest-700/30'
+          className={`h-12 w-full rounded-2xl border-2 bg-white px-4 text-leaf transition-colors placeholder:text-leaf/50 focus:border-leaf focus:bg-zest-soft/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-leaf/30 ${
+            error ? 'border-red-700' : 'border-leaf/30'
           } ${isPassword ? 'pr-12' : ''} ${className}`}
         />
         {isPassword && (
@@ -41,7 +41,7 @@ export default function Field({ label, error, type = 'text', className = '', ...
             onClick={() => setShown((s) => !s)}
             aria-label={shown ? 'Sembunyikan password' : 'Tampilkan password'}
             aria-pressed={shown}
-            className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-2xl text-forest-700 hover:text-ink"
+            className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-2xl text-leaf-600 hover:text-leaf"
           >
             <Eye off={shown} />
           </button>
