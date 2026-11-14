@@ -1,0 +1,190 @@
+import { useRef } from 'react'
+import { gsap, useMotion } from '../../lib/motion'
+import ScrubText from './ScrubText'
+
+const views = [
+  ['Dashboard', 'Ringkasan XP, streak, dan misi harianmu.'],
+  ['Challenge', 'Misi harian dan tantangan sesuai levelmu.'],
+  ['Scan Sampah', 'Foto sampah, lihat hasil pemilahannya.'],
+  ['Leaderboard', 'Bandingkan XP dengan pengguna lain.'],
+  ['Reward', 'Tukar poin dengan voucher mitra hijau.'],
+  ['Komunitas', 'Lihat dan ajukan event lingkungan.'],
+  ['Profil', 'Level, tanaman, dan riwayat progresmu.'],
+  ['Panel Admin', 'Kelola tantangan, reward, dan pengguna.'],
+]
+
+// cls = warna dasar kartu, base = warna teks dasar, fill = warna yang menyapu kartu saat kursor masuk,
+// text = warna teks saat kartu terisi. Nilai hex dipakai karena GSAP menganimasikan warnanya.
+const tones = [
+  { cls: 'bg-leaf text-white', base: '#ffffff', fill: '#c6f26b', text: '#0b4a3a' },
+  { cls: 'bg-zest text-leaf', base: '#0b4a3a', fill: '#0b4a3a', text: '#ffffff' },
+  { cls: 'bg-white text-leaf', base: '#0b4a3a', fill: '#14604a', text: '#ffffff' },
+  { cls: 'bg-leaf-600 text-white', base: '#ffffff', fill: '#e2f9ae', text: '#0b4a3a' },
+]
+
+const Arrow = ({ className = '' }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M7 17L17 7M9 7h8v8" />
+  </svg>
+)
+
+export default function Features() {
+  const ref = useRef<HTMLElement>(null)
+
+  useMotion(ref, () => {
+    const root = ref.current!
+    gsap.fromTo(
+      '.sw',
+      { opacity: 0.15 },
+      { opacity: 1, stagger: 0.12, ease: 'none', scrollTrigger: { trigger: '.scrub', start: 'top 85%', end: 'bottom 50%', scrub: true } },
+    )
+    gsap.from('.card', {
+      y: 60,
+      opacity: 0,
+      rotate: (i: number) => (i % 2 ? 2 : -2),
+      duration: 0.9,
+      stagger: 0.08,
+      ease: 'power3.out',
+      clearProps: 'opacity',
+      scrollTrigger: { trigger: root, start: 'top 70%' },
+    })
+
+    const grid = root.querySelector<HTMLElement>('.grid-wrap')!
+    const bubble = root.querySelector<HTMLElement>('.bubble')!
+    gsap.set(bubble, { scale: 0 })
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
+
+    const cards = gsap.utils.toArray<HTMLElement>('.card', root)
+    const bx = gsap.quickTo(bubble, 'x', { duration: 0.45, ease: 'power3' })
+    const by = gsap.quickTo(bubble, 'y', { duration: 0.45, ease: 'power3' })
+    const cleanups: (() => void)[] = []
+
+    cards.forEach((card, i) => {
+      const t = tones[i % tones.length]
+      const fill = card.querySelector<HTMLElement>('.fill')!
+      const body = card.querySelector<HTMLElement>('.body')!
+      const arrow = card.querySelector<HTMLElement>('.arrow')!
+      const others = cards.filter((c) => c !== card)
+      gsap.set(card, { transformPerspective: 900 })
+      const rX = gsap.quickTo(card, 'rotationX', { duration: 0.5, ease: 'power3' })
+      const rY = gsap.quickTo(card, 'rotationY', { duration: 0.5, ease: 'power3' })
+
+      const pct = (e: PointerEvent | null) => {
+        if (!e) return [50, 50]
+        const r = card.getBoundingClientRect()
+        return [((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100]
+      }
+      // Warna menyapu dari titik masuk kursor, kartu lain meredup, gelembung berubah warna.
+      const enter = (e: PointerEvent | null) => {
+        const [x, y] = pct(e)
+        gsap.killTweensOf(fill)
+        gsap.fromTo(fill, { clipPath: `circle(0% at ${x}% ${y}%)` }, { clipPath: `circle(150% at ${x}% ${y}%)`, duration: 0.65, ease: 'power3.out' })
+        gsap.to(body, { color: t.text, duration: 0.3 })
+        gsap.to(arrow, { x: 4, y: -4, rotate: 45, duration: 0.4, ease: 'back.out(2)' })
+        gsap.to(others, { opacity: 0.55, scale: 0.97, duration: 0.35, overwrite: 'auto' })
+        gsap.to(card, { opacity: 1, scale: 1, duration: 0.35, overwrite: 'auto' })
+        gsap.to(bubble, { scale: 1, backgroundColor: t.text, color: t.fill, duration: 0.35, ease: 'back.out(1.8)' })
+      }
+      // Warna menyusut ke titik keluar kursor.
+      const leave = (e: PointerEvent | null) => {
+        const [x, y] = pct(e)
+        gsap.killTweensOf(fill)
+        gsap.to(fill, { clipPath: `circle(0% at ${x}% ${y}%)`, duration: 0.5, ease: 'power3.inOut' })
+        gsap.to(body, { color: t.base, duration: 0.3 })
+        gsap.to(arrow, { x: 0, y: 0, rotate: 0, duration: 0.4 })
+        rX(0)
+        rY(0)
+      }
+      const move = (e: PointerEvent) => {
+        const r = card.getBoundingClientRect()
+        const px = (e.clientX - r.left) / r.width
+        const py = (e.clientY - r.top) / r.height
+        rY((px - 0.5) * 14)
+        rX(-(py - 0.5) * 14)
+        card.style.setProperty('--mx', `${px * 100}%`)
+        card.style.setProperty('--my', `${py * 100}%`)
+      }
+      const onEnter = (e: PointerEvent) => enter(e)
+      const onLeave = (e: PointerEvent) => leave(e)
+      const onFocus = () => enter(null)
+      const onBlur = () => leave(null)
+      card.addEventListener('pointerenter', onEnter)
+      card.addEventListener('pointerleave', onLeave)
+      card.addEventListener('pointermove', move)
+      card.addEventListener('focus', onFocus)
+      card.addEventListener('blur', onBlur)
+      cleanups.push(() => {
+        card.removeEventListener('pointerenter', onEnter)
+        card.removeEventListener('pointerleave', onLeave)
+        card.removeEventListener('pointermove', move)
+        card.removeEventListener('focus', onFocus)
+        card.removeEventListener('blur', onBlur)
+      })
+    })
+
+    // Gelembung "Buka" mengikuti kursor di dalam grid; hilang saat kursor keluar grid.
+    const gridMove = (e: PointerEvent) => {
+      const r = grid.getBoundingClientRect()
+      bx(e.clientX - r.left)
+      by(e.clientY - r.top)
+    }
+    const gridLeave = () => {
+      gsap.to(cards, { opacity: 1, scale: 1, duration: 0.4, overwrite: 'auto' })
+      gsap.to(bubble, { scale: 0, duration: 0.3 })
+    }
+    grid.addEventListener('pointermove', gridMove)
+    grid.addEventListener('pointerleave', gridLeave)
+    return () => {
+      cleanups.forEach((c) => c())
+      grid.removeEventListener('pointermove', gridMove)
+      grid.removeEventListener('pointerleave', gridLeave)
+    }
+  })
+
+  return (
+    <section ref={ref} id="fitur" className="mx-auto max-w-6xl px-6 py-28">
+      <h2 className="scrub max-w-3xl font-display text-4xl font-bold tracking-tight md:text-6xl">
+        <ScrubText text="Semua tampilan, satu platform." />
+      </h2>
+      <p className="mt-6 max-w-lg text-lg text-leaf/70">Masuk untuk membuka setiap bagian. Menu menyesuaikan peran akunmu.</p>
+      <div className="grid-wrap relative mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {views.map(([title, body], i) => {
+          const t = tones[i % tones.length]
+          return (
+            <a
+              key={title}
+              href="#cta"
+              className={`card group relative flex min-h-52 overflow-hidden rounded-3xl border-2 border-leaf p-6 shadow-[6px_6px_0_0_var(--color-leaf)] transition-[box-shadow] duration-300 hover:shadow-[10px_10px_0_0_var(--color-leaf)] ${t.cls}`}
+            >
+              <span aria-hidden="true" className="fill pointer-events-none absolute inset-0" style={{ background: t.fill, clipPath: 'circle(0% at 50% 50%)' }} />
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{ background: 'radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.4), transparent 65%)' }}
+              />
+              <span className="body relative flex w-full flex-col justify-between">
+                <span className="flex items-start justify-between">
+                  <span className="font-display text-sm font-semibold opacity-80">{String(i + 1).padStart(2, '0')}</span>
+                  <Arrow className="arrow size-6" />
+                </span>
+                <span>
+                  <span className="block font-display text-2xl font-semibold">{title}</span>
+                  <span className="mt-2 block text-sm leading-relaxed opacity-80">{body}</span>
+                </span>
+              </span>
+            </a>
+          )
+        })}
+        <span
+          aria-hidden="true"
+          className="bubble pointer-events-none absolute top-0 left-0 z-20 -mt-11 -ml-11 grid size-[5.5rem] place-items-center rounded-full text-sm font-bold motion-reduce:hidden"
+          style={{ background: '#0b4a3a', color: '#c6f26b' }}
+        >
+          <span className="flex items-center gap-1">
+            Buka <Arrow className="size-4" />
+          </span>
+        </span>
+      </div>
+    </section>
+  )
+}
