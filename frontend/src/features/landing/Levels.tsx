@@ -27,14 +27,89 @@ const leaves = [
   { y: 215, r: -66, s: 1.1, f: '#14604a' },
 ]
 
-const crowns = [
-  { cx: 200, cy: 150, r: 62, f: '#14604a' },
-  { cx: 142, cy: 172, r: 46, f: '#ffffff' },
-  { cx: 258, cy: 172, r: 46, f: '#0b4a3a' },
-  { cx: 200, cy: 92, r: 44, f: '#ffffff' },
-  { cx: 150, cy: 108, r: 36, f: '#0b4a3a' },
-  { cx: 250, cy: 108, r: 36, f: '#14604a' },
+type Pt = [number, number]
+
+// Cabang utama pohon: 4 titik kontrol kurva bezier kubik, w = tebal garis, y = titik tumbuh di batang.
+const mainBranches: { p: [Pt, Pt, Pt, Pt]; w: number }[] = [
+  { p: [[200, 318], [178, 300], [146, 292], [104, 250]], w: 6 },
+  { p: [[200, 300], [224, 282], [262, 276], [298, 236]], w: 6 },
+  { p: [[200, 262], [176, 244], [140, 232], [96, 184]], w: 6.5 },
+  { p: [[200, 250], [226, 232], [266, 216], [308, 168]], w: 6.5 },
+  { p: [[200, 214], [180, 188], [150, 166], [124, 112]], w: 6 },
+  { p: [[200, 204], [222, 176], [254, 150], [282, 96]], w: 6 },
+  { p: [[200, 176], [196, 146], [206, 110], [199, 64]], w: 7 },
 ]
+
+// Ranting: tumbuh dari tengah cabang induk. off = selisih titik kontrol dari titik awal.
+const twigDefs: { parent: number; t: number; off: [Pt, Pt, Pt] }[] = [
+  { parent: 0, t: 0.6, off: [[-2, -24], [-12, -40], [-16, -62]] },
+  { parent: 1, t: 0.6, off: [[4, -24], [14, -40], [18, -62]] },
+  { parent: 2, t: 0.55, off: [[-4, -22], [-18, -40], [-22, -64]] },
+  { parent: 3, t: 0.55, off: [[6, -22], [20, -40], [24, -64]] },
+  { parent: 4, t: 0.6, off: [[12, -14], [30, -26], [40, -50]] },
+  { parent: 5, t: 0.6, off: [[-12, -14], [-30, -26], [-40, -50]] },
+]
+
+const STEM_DUR = 4 // batang selesai tumbuh di detik ke-4 dari 5 satuan timeline
+const BR_DUR = 0.7
+const TWIG_DUR = 0.45
+const LEAF_POP = 0.25
+
+const bez = ([p0, p1, p2, p3]: [Pt, Pt, Pt, Pt], t: number): Pt => {
+  const m = 1 - t
+  const a = m * m * m, b = 3 * m * m * t, c = 3 * m * t * t, d = t * t * t
+  return [a * p0[0] + b * p1[0] + c * p2[0] + d * p3[0], a * p0[1] + b * p1[1] + c * p2[1] + d * p3[1]]
+}
+// Sudut arah kurva dalam derajat, 0 = menunjuk ke atas, positif = searah jarum jam.
+const heading = ([p0, p1, p2, p3]: [Pt, Pt, Pt, Pt], t: number) => {
+  const m = 1 - t
+  const dx = 3 * m * m * (p1[0] - p0[0]) + 6 * m * t * (p2[0] - p1[0]) + 3 * t * t * (p3[0] - p2[0])
+  const dy = 3 * m * m * (p1[1] - p0[1]) + 6 * m * t * (p2[1] - p1[1]) + 3 * t * t * (p3[1] - p2[1])
+  return (Math.atan2(dx, -dy) * 180) / Math.PI
+}
+// Variasi deterministik (tanpa Math.random) supaya hasil render selalu sama.
+const rnd = (i: number) => {
+  const x = Math.sin(i * 127.1 + 311.7) * 43758.5453
+  return x - Math.floor(x)
+}
+const FOLIAGE = ['#14604a', '#ffffff', '#e2f9ae', '#0b4a3a', '#14604a']
+const dPath = ([p0, p1, p2, p3]: [Pt, Pt, Pt, Pt]) => `M${p0[0]} ${p0[1]} C${p1[0]} ${p1[1]} ${p2[0]} ${p2[1]} ${p3[0]} ${p3[1]}`
+
+type Branch = { d: string; w: number; at: number; dur: number }
+type Foliage = { x: number; y: number; r: number; s: number; f: string; at: number }
+
+const branches: Branch[] = []
+const foliage: Foliage[] = []
+let seed = 0
+
+// Daun berselang-seling di kiri-kanan cabang, ditambah satu daun di ujung.
+const addLeaves = (curve: [Pt, Pt, Pt, Pt], start: number, dur: number, count: number, size: number) => {
+  for (let k = 0; k <= count; k++) {
+    const tip = k === count
+    const t = tip ? 1 : 0.25 + (0.7 * k) / count
+    const [x, y] = bez(curve, t)
+    const side = k % 2 ? 1 : -1
+    const r = heading(curve, t) + (tip ? (rnd(seed) - 0.5) * 24 : side * (38 + rnd(seed) * 28))
+    foliage.push({ x, y, r, s: tip ? size * 1.25 : size * (0.75 + rnd(seed + 1) * 0.5), f: FOLIAGE[Math.floor(rnd(seed + 2) * FOLIAGE.length)], at: start + dur * t })
+    seed += 3
+  }
+}
+
+mainBranches.forEach((b) => {
+  const startY = b.p[0][1]
+  const at = Math.min(((STEM_BASE - startY) / (STEM_BASE - STEM_TOP)) * STEM_DUR, 3.6)
+  branches.push({ d: dPath(b.p), w: b.w, at, dur: BR_DUR })
+  addLeaves(b.p, at, BR_DUR, 8, 0.6)
+})
+twigDefs.forEach((tw) => {
+  const parent = mainBranches[tw.parent]
+  const pAt = branches[tw.parent].at
+  const p0 = bez(parent.p, tw.t)
+  const curve: [Pt, Pt, Pt, Pt] = [p0, [p0[0] + tw.off[0][0], p0[1] + tw.off[0][1]], [p0[0] + tw.off[1][0], p0[1] + tw.off[1][1]], [p0[0] + tw.off[2][0], p0[1] + tw.off[2][1]]]
+  const at = pAt + BR_DUR * tw.t
+  branches.push({ d: dPath(curve), w: 3.5, at, dur: TWIG_DUR })
+  addLeaves(curve, at, TWIG_DUR, 4, 0.55)
+})
 
 const spores = [
   { l: '12%', t: '70%' },
@@ -57,14 +132,26 @@ export default function Levels() {
 
     // Tanaman tumbuh mengikuti scroll: batang digambar, daun mekar, lalu mahkota pohon.
     tl.fromTo('.ground', { scaleX: 0, transformOrigin: '50% 50%' }, { scaleX: 1, duration: 0.6, ease: 'power2.out' }, 0)
-    tl.fromTo('.stem', { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: N }, 0)
+    tl.fromTo('.stem', { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: STEM_DUR }, 0)
+    // Batang makin tebal dan pangkalnya melebar seperti akar saat tanaman menjadi pohon.
+    tl.to('.stem', { strokeWidth: 16, duration: 2 }, 2)
+    tl.fromTo('.trunk', { scaleY: 0, transformOrigin: '50% 100%' }, { scaleY: 1, duration: 0.9, ease: 'power2.out' }, 2.2)
     tl.fromTo('.prog-fill', { scaleX: 0 }, { scaleX: 1, duration: N }, 0)
 
     gsap.utils.toArray<SVGElement>('.leaf').forEach((el) => {
-      const at = ((STEM_BASE - Number(el.dataset.y)) / (STEM_BASE - STEM_TOP)) * N + 0.05
+      const y = Number(el.dataset.y)
+      const at = ((STEM_BASE - y) / (STEM_BASE - STEM_TOP)) * STEM_DUR + 0.05
       tl.fromTo(el, { scale: 0, transformOrigin: '50% 100%' }, { scale: 1, duration: 0.7, ease: 'back.out(2)' }, at)
+      // Daun tanaman muda rontok saat cabang pohon mulai tumbuh; daun di batang bawah lebih dulu.
+      tl.to(el, { scale: 0, duration: 0.4, ease: 'power2.in' }, y >= 300 ? 2.9 : 3.3)
     })
-    tl.fromTo('.crown', { scale: 0, transformOrigin: '50% 50%' }, { scale: 1, duration: 0.5, stagger: 0.1, ease: 'back.out(1.7)' }, N - 1.1)
+    // Cabang digambar dari batang, lalu daun muncul satu per satu mengikuti ujung cabang.
+    gsap.utils.toArray<SVGElement>('.br').forEach((el) => {
+      tl.fromTo(el, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: Number(el.dataset.dur), ease: 'power1.out' }, Number(el.dataset.at))
+    })
+    gsap.utils.toArray<SVGElement>('.fol').forEach((el) => {
+      tl.fromTo(el, { scale: 0, transformOrigin: '50% 100%' }, { scale: 1, duration: LEAF_POP, ease: 'back.out(2)' }, Number(el.dataset.at))
+    })
 
     // Teks level bergantian dan titik progres menyala.
     tl.set('.lt-0', { opacity: 1, y: 0 }, 0)
@@ -147,8 +234,27 @@ export default function Levels() {
                 <path className="leaf" data-y={l.y} d={LEAF} fill={l.f} stroke="#0b4a3a" strokeWidth="3" strokeLinejoin="round" />
               </g>
             ))}
-            {crowns.map((c, i) => (
-              <circle key={i} className="crown" cx={c.cx} cy={c.cy} r={c.r} fill={c.f} stroke="#0b4a3a" strokeWidth="3" />
+            <path className="trunk" d="M176 452 C190 438 193 414 195 384 L205 384 C207 414 210 438 224 452 Z" fill="#0b4a3a" />
+            {branches.map((b, i) => (
+              <path
+                key={i}
+                className="br"
+                data-at={b.at}
+                data-dur={b.dur}
+                d={b.d}
+                pathLength={1}
+                fill="none"
+                stroke="#0b4a3a"
+                strokeWidth={b.w}
+                strokeLinecap="round"
+                strokeDasharray="1"
+                style={{ strokeDashoffset: 0 }}
+              />
+            ))}
+            {foliage.map((l, i) => (
+              <g key={i} transform={`translate(${l.x.toFixed(1)} ${l.y.toFixed(1)}) rotate(${l.r.toFixed(1)}) scale(${l.s.toFixed(2)})`}>
+                <path className="fol" data-at={l.at} d={LEAF} fill={l.f} stroke="#0b4a3a" strokeWidth={(2.2 / l.s).toFixed(1)} strokeLinejoin="round" />
+              </g>
             ))}
           </svg>
         </div>

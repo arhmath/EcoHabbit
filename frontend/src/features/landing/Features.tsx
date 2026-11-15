@@ -55,8 +55,8 @@ export default function Features() {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
 
     const cards = gsap.utils.toArray<HTMLElement>('.card', root)
-    const bx = gsap.quickTo(bubble, 'x', { duration: 0.45, ease: 'power3' })
-    const by = gsap.quickTo(bubble, 'y', { duration: 0.45, ease: 'power3' })
+    const bx = gsap.quickTo(bubble, 'x', { duration: 0.3, ease: 'power3' })
+    const by = gsap.quickTo(bubble, 'y', { duration: 0.3, ease: 'power3' })
     const cleanups: (() => void)[] = []
 
     cards.forEach((card, i) => {
@@ -74,7 +74,7 @@ export default function Features() {
         const r = card.getBoundingClientRect()
         return [((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100]
       }
-      // Warna menyapu dari titik masuk kursor, kartu lain meredup, gelembung berubah warna.
+      // Warna menyapu dari titik masuk kursor, kartu lain meredup, kursor bulat berubah warna.
       const enter = (e: PointerEvent | null) => {
         const [x, y] = pct(e)
         gsap.killTweensOf(fill)
@@ -83,7 +83,7 @@ export default function Features() {
         gsap.to(arrow, { x: 4, y: -4, rotate: 45, duration: 0.4, ease: 'back.out(2)' })
         gsap.to(others, { opacity: 0.55, scale: 0.97, duration: 0.35, overwrite: 'auto' })
         gsap.to(card, { opacity: 1, scale: 1, duration: 0.35, overwrite: 'auto' })
-        gsap.to(bubble, { scale: 1, backgroundColor: t.text, color: t.fill, duration: 0.35, ease: 'back.out(1.8)' })
+        gsap.to(bubble, { scale: 1, backgroundColor: t.text, duration: 0.35, ease: 'back.out(1.8)' })
       }
       // Warna menyusut ke titik keluar kursor.
       const leave = (e: PointerEvent | null) => {
@@ -122,7 +122,9 @@ export default function Features() {
       })
     })
 
-    // Gelembung "Buka" mengikuti kursor di dalam grid; hilang saat kursor keluar grid.
+    // Kursor bulat mengikuti pointer di dalam grid; kursor asli disembunyikan, dan kembali saat pointer keluar grid.
+    cards.forEach((c) => c.classList.add('cursor-none'))
+    grid.classList.add('cursor-none')
     const gridMove = (e: PointerEvent) => {
       const r = grid.getBoundingClientRect()
       bx(e.clientX - r.left)
@@ -136,6 +138,8 @@ export default function Features() {
     grid.addEventListener('pointerleave', gridLeave)
     return () => {
       cleanups.forEach((c) => c())
+      cards.forEach((c) => c.classList.remove('cursor-none'))
+      grid.classList.remove('cursor-none')
       grid.removeEventListener('pointermove', gridMove)
       grid.removeEventListener('pointerleave', gridLeave)
     }
@@ -177,13 +181,9 @@ export default function Features() {
         })}
         <span
           aria-hidden="true"
-          className="bubble pointer-events-none absolute top-0 left-0 z-20 -mt-11 -ml-11 grid size-[5.5rem] place-items-center rounded-full text-sm font-bold motion-reduce:hidden"
-          style={{ background: '#0b4a3a', color: '#c6f26b' }}
-        >
-          <span className="flex items-center gap-1">
-            Buka <Arrow className="size-4" />
-          </span>
-        </span>
+          className="bubble pointer-events-none absolute top-0 left-0 z-20 -mt-4 -ml-4 size-8 rounded-full motion-reduce:hidden"
+          style={{ background: '#0b4a3a' }}
+        />
       </div>
     </section>
   )

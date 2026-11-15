@@ -1,4 +1,5 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Outlet } from 'react-router-dom'
+import RouteTransition from '../components/RouteTransition'
 import SplashScreen from '../components/SplashScreen'
 import StatusPage from '../components/StatusPage'
 import { GuestOnly, RequireAuth } from '../features/auth/RoleGuard'
@@ -9,6 +10,12 @@ const page = <T extends { default: React.ComponentType }>(load: () => Promise<T>
 export const router = createBrowserRouter([
   {
     HydrateFallback: SplashScreen,
+    element: (
+      <>
+        <Outlet />
+        <RouteTransition />
+      </>
+    ),
     children: [
       { path: '/', lazy: page(() => import('../features/landing/LandingPage')) },
       {
