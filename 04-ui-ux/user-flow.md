@@ -1,6 +1,6 @@
 # 04b - User Flow
 
-Versi v0.1 (draft Fase 1). Dirender otomatis oleh GitHub.
+Versi v0.1 (draft).
 
 ## Alur Utama Aplikasi
 

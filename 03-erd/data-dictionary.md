@@ -1,6 +1,7 @@
 # Kamus Data
 
-Versi v0.1 (draft Fase 1). Tipe bersifat umum untuk basis data relasional; sesuaikan dengan konvensi migration tim Fullstack. `PK` primary key, `FK` foreign key, `UK` unique, `Null` boleh kosong.
+Versi v0.1 
+Tipe bersifat umum untuk basis data relasional; sesuaikan dengan konvensi migration tim Fullstack. `PK` primary key, `FK` foreign key, `UK` unique, `Null` boleh kosong.
 
 ## users
 Akun pengguna dan admin.

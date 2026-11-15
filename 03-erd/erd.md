@@ -1,6 +1,7 @@
 # 03 - Entity Relationship Diagram
 
-Versi v0.1 (draft Fase 1). Dirender otomatis oleh GitHub. Kamus data: [data-dictionary.md](data-dictionary.md).
+Versi v0.1 (draft)
+Kamus data: [data-dictionary.md](data-dictionary.md).
 
 > Draft. Nama tabel, tipe, dan konvensi harus diselaraskan dengan migration tim Fullstack sebelum dipakai sebagai acuan implementasi (asumsi A-03).
 
@@ -156,7 +157,7 @@ erDiagram
     }
 ```
 
-## Keputusan Rancangan
+## Notes Rancangan
 
 - **RBAC sederhana:** role disimpan sebagai kolom `users.role` (`user` atau `admin`), cukup untuk dua role pada notes. Bila role bertambah, pindahkan ke tabel `roles`.
 - **XP dan poin dipisah:** `total_xp` menentukan level; `points_balance` dipakai untuk reward (sesuai kebutuhan admin memantau XP dan poin). Semua perubahan poin dicatat di `point_transactions` (ledger), sehingga saldo bisa diaudit.

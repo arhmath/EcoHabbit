@@ -1,12 +1,13 @@
 # 02 - Use Case Diagram
 
-Versi v0.1 (draft Fase 1). Sumber kebutuhan: [01-kebutuhan-sistem.md](../01-kebutuhan-sistem.md).
+Versi v0.1 
+Sumber kebutuhan: [01-kebutuhan-sistem.md](../01-kebutuhan-sistem.md).
 
 ![Use case diagram EcoHabbit](use-case.svg)
 
-File sumber yang dapat diedit: [`use-case.drawio`](use-case.drawio) (buka di [diagrams.net](https://app.diagrams.net)). Diagram `.svg` dan `.drawio` dihasilkan dari skrip yang sama; bila diedit manual di diagrams.net, ekspor ulang SVG dan timpa file ini.
+File editable: [`use-case.drawio`].
 
-Kode UC (UC-U01 dan seterusnya) hanya dipakai di tabel spesifikasi dan keterlacakan; diagram sengaja tanpa kode, cocokkan lewat nama use case.
+Kode hanya dipakai di tabel spesifikasi dan keterlacakan; diagram sengaja tanpa kode, cocokkan lewat nama use case.
 
 Catatan notasi:
 - `«include»`: use case induk selalu menjalankan use case terkait (pemilahan sampah selalu meliputi unggah, deteksi AI, dan konfirmasi).

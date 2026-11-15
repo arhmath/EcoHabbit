@@ -1,8 +1,8 @@
 # 04a - Pemetaan Fitur ke Layar Figma
 
-Versi v0.1 (draft Fase 1). Dibuat dari daftar nama frame Figma (isi layar belum diverifikasi satu per satu). Tautan Figma: **[isi tautan Figma]**.
+Versi v0.1 (draft).
+Tautan Figma: **https://www.figma.com/design/nGwkn74NhCcGsiDTz9xR4r/EcoHabbit?node-id=241-273**.
 
-Desain Figma saat ini berasal dari proyek UINIC 2025 (aplikasi habit tracker hijau) yang dialihkan ke tema daur ulang sesuai notes tim. Karena itu sebagian layar masih memuat konten proyek asal.
 
 ## 1. Fitur notes yang sudah punya layar
 
@@ -35,22 +35,4 @@ Desain Figma saat ini berasal dari proyek UINIC 2025 (aplikasi habit tracker hij
 | Sedang | Form buat event (user, level tertentu) | FR-25 | UC-U13 |
 | Rendah | Profil admin | FR-07 | UC-A03 |
 
-## 3. Frame sisa proyek asal (perlu keputusan)
 
-Frame berikut mengikuti tema habit tracker proyek asal dan belum tentu relevan pada versi daur ulang. Putuskan per frame: **hapus**, **pertahankan sebagai contoh isi challenge**, atau **adaptasi**.
-
-| Frame | Keputusan |
-|---|---|
-| Panduan Kompos | [ ] |
-| Catat Item Dihindari | [ ] |
-| Menu Hemat Energi Rumah, Pop Up Mulai Tantangan Hemat Energi Rumah | [ ] |
-| Menu Minimalisir Botol Plastik, Pop Up Mulai Tantangan Minimalisir Botol Plastik | [ ] |
-| Bebas Kantong Plastik | [ ] |
-
-Frame Kebijakan Privasi, Syarat & Ketentuan, dan Notifikasi tidak ada di notes tetapi tidak bertentangan; dipertahankan.
-
-## 4. Catatan kebersihan berkas Figma
-
-- Ada frame ganda bernama sama (Pop Up Pemilahan Sampah, Pop Up Penukaran, Hadiah dan Penukaran, Login/Register). Beri akhiran versi atau hapus yang usang.
-- `Login Filed` dan `Regisetr Blank` salah ketik; `Filed` kemungkinan maksud `Filled`.
-- Layer `image 5/6/7`, `Vector`, `Save` sebaiknya dirapikan ke dalam frame induknya.

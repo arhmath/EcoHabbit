@@ -10,8 +10,6 @@
 
 EcoHabbit adalah aplikasi web berbasis gamifikasi untuk membangun kebiasaan memilah dan mendaur ulang sampah. Pengguna mencatat pemilahan sampah harian dengan foto; model AI (object detection multilabel) mengenali jenis dan jumlah sampah, lalu sistem memberi XP dan poin. XP menaikkan level (1 sampai 5), poin ditukar dengan reward. Komunitas dan event mendorong keterlibatan.
 
-Sumber kebutuhan: halaman notes tim, Project Plan, dan proposal UI/UX UINIC 2025 (proyek asal yang dialihkan ke tema daur ulang). Bila ada pertentangan, notes tim yang berlaku.
-
 ## 2. Aktor
 
 | Aktor | Deskripsi |
@@ -122,20 +120,15 @@ Prioritas memakai MoSCoW: **M**ust, **S**hould, **C**ould. ID dipakai sebagai re
 | NFR-05 | Waktu deteksi AI per foto dapat diterima untuk penggunaan interaktif | **Target angka belum ditetapkan.** Perlu hasil uji dari tim Machine Learning dan Infrastructure |
 | NFR-06 | Perubahan poin dapat ditelusuri (audit trail) | Terkait FR-23 |
 
-## 5. Batasan dan Asumsi
+## 5. Batasan
 
-**Batasan (dari notes tim)**
+**Batasan Scope**
 - Backend tidak memakai layanan managed (BaaS/PaaS seperti Supabase, Firebase, Vercel, Railway, Render). Seluruh komponen di-host dan dikelola sendiri.
 - Penyimpanan objek memakai S3-compatible storage. Kredensial tidak boleh masuk ke repositori; simpan di `.env`.
 - Model AI dilatih dari dataset yang disediakan (train 34.230, val 4.278, test 4.280 gambar).
-
-**Asumsi (perlu dikonfirmasi, tercatat untuk revisi sprint berikutnya)**
-- A-01: Event dibuat oleh user pada level tertentu dan dipantau admin (mengikuti notes; berbeda dari proposal UINIC).
-- A-02: Platform web responsif, bukan aplikasi mobile native.
-- A-03: Stack basis data relasional; ERD mengikuti konvensi migration yang dipakai tim Fullstack.
-- A-04: Level minimum untuk membuat event belum ditentukan; disimpan sebagai atribut level (`can_create_event`).
-- A-06: Akun admin dibuat lewat seeder atau oleh admin lain, bukan lewat registrasi publik; admin tidak mengikuti challenge, memilah sampah, atau menukar reward (sesuai pembagian pada notes).
-- A-05: Aturan konversi jumlah sampah menjadi XP dan poin belum ditetapkan; disimpan di tiap challenge dan pemilahan, bukan hardcode.
+- Event dibuat oleh user pada level tertentu dan dipantau admin.
+- Platform web responsif, mobile oriented.
+- Stack basis data relasional; ERD mengikuti konvensi migration yang dipakai tim Fullstack.
 
 ## 6. Di Luar Lingkup (v0.1)
 
