@@ -1,25 +1,36 @@
 # EcoHabbit
 
-> Aplikasi web gamifikasi untuk membangun kebiasaan memilah dan mendaur ulang sampah.
-> Pengguna mencatat pemilahan harian dengan foto; model AI (object detection multilabel, 6 kelas) mengenali jenis sampah, lalu sistem memberi XP dan poin untuk naik level dan menukar reward.
+**EcoHabbit** adalah aplikasi web gamifikasi yang membantu pengguna membangun kebiasaan memilah dan mendaur ulang sampah secara konsisten.
+
+Pengguna mencatat pemilahan harian dengan foto. Model AI mengenali jenis dan jumlah sampah secara otomatis — sistem lalu memberikan XP dan poin sebagai penghargaan. XP menaikkan level (1–5), poin dapat ditukar dengan reward. Challenge, leaderboard, dan event komunitas mendorong keterlibatan jangka panjang.
 
 ---
 
-## Tim & Area Kerja
+## Fitur Utama
 
-| Tim | Folder | Status |
-|---|---|---|
-| Information Systems (IS) | `01-kebutuhan-sistem.md`, `02-use-case/`, `03-erd/`, `04-ui-ux/` | ✅ Draft v0.1 |
-| Fullstack | _(belum)_ | 🔜 Fase 2 |
-| Machine Learning | _(belum)_ | 🔜 Fase 2 |
-| Infrastructure | _(belum)_ | 🔜 Fase 2 |
-
-> [!NOTE]
-> Repo ini adalah monorepo utama EcoHabbit. Tiap tim berkontribusi di folder atau branch masing-masing. Konvensi folder dan branch strategy dibahas sebelum Fase 2 dimulai.
+- 📸 **Catat pemilahan sampah** — unggah foto, AI deteksi 6 kelas sampah (kertas, plastik, kaca, kardus, organik, lainnya), user konfirmasi hasilnya
+- 🏆 **Gamifikasi** — XP, level, streak harian, leaderboard, challenge reguler dan dadakan
+- 🎁 **Reward** — tukar poin dengan voucher dan hadiah
+- 🌱 **Komunitas** — event yang bisa dibuat user (dengan syarat level tertentu) dan dipantau admin
+- 🛠️ **Admin panel** — kelola challenge, reward, pantau statistik dan event
 
 ---
 
-## Dokumentasi IS (Information Systems)
+## Tech Stack
+
+| Komponen | Keterangan |
+|---|---|
+| Platform | Web responsif, mobile-first |
+| Backend | REST API, self-hosted (tidak memakai BaaS/PaaS) |
+| Database | Relasional |
+| Object Storage | S3-compatible, kredensial via `.env` |
+| AI | Object detection multilabel, 6 kelas sampah |
+
+---
+
+## Dokumentasi
+
+Dokumentasi Information Systems (IS) tersedia di repo ini sebagai referensi lintas tim.
 
 | # | Dokumen | Isi |
 |---|---|---|
@@ -28,24 +39,12 @@
 | 3 | [ERD](03-erd/erd.md) + [Kamus Data](03-erd/data-dictionary.md) | 14 tabel, relasi, tipe kolom |
 | 4 | [Pemetaan Layar](04-ui-ux/mapping-layar.md) + [User Flow](04-ui-ux/user-flow.md) | Figma mapping, sequence diagram, alur layar |
 
-Versi dokumen IS: **v0.1 (draft Fase 1)** · Revisi dicatat di [CHANGELOG](CHANGELOG.md)
+Versi dokumen: **v0.1 (draft Fase 1)** · Revisi dicatat di [CHANGELOG](CHANGELOG.md)
 
 ---
 
-## Cara Berkontribusi ke Dokumen IS
+## Berkontribusi
 
 - **ERD & User Flow:** edit blok Mermaid di file `.md`, preview di [mermaid.live](https://mermaid.live)
 - **Use Case Diagram:** buka `02-use-case/use-case.drawio` di [diagrams.net](https://app.diagrams.net), edit, ekspor SVG, timpa `use-case.svg`
 - Semua revisi penting dicatat di CHANGELOG dengan nomor versi dan alasan perubahan
-
----
-
-## Stack Ringkas
-
-| Komponen | Keterangan |
-|---|---|
-| Platform | Web responsif, mobile-first |
-| Backend | REST API, dikelola sendiri (tidak memakai BaaS/PaaS) |
-| Object Storage | S3-compatible, kredensial via `.env` |
-| AI | Model object detection multilabel, 6 kelas sampah |
-| Database | Relasional (konvensi mengikuti migration Fullstack) |
