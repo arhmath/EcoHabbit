@@ -1,5 +1,5 @@
 import { ApiError } from '../api/errors'
-import { getToken } from '../lib/tokenStorage'
+import { getToken, setToken } from '../lib/tokenStorage'
 import type { AuthPayload, LoginRequest, RegisterRequest, User } from '../types/api'
 
 type Account = User & { password: string }
@@ -31,13 +31,32 @@ export async function mockRegister(body: RegisterRequest): Promise<AuthPayload> 
   return { token: encode(user), user }
 }
 
-export async function mockMe(): Promise<User> {
-  await wait(250)
+/** Pengguna mock dari token saat ini (sinkron). Dipakai mock data lain agar tahu siapa yang sedang login. */
+export function decodeMockToken(): User | null {
   const token = getToken()
   try {
-    if (!token?.startsWith('mock.')) throw new Error('bukan token mock')
+    if (!token?.startsWith('mock.')) return null
     return JSON.parse(decodeURIComponent(atob(token.slice(5)))) as User
   } catch {
-    throw new ApiError(401, 'Sesi Anda berakhir. Silakan masuk kembali.')
+    return null
   }
+}
+
+export async function mockMe(): Promise<User> {
+  await wait(250)
+  const user = decodeMockToken()
+  if (!user) throw new ApiError(401, 'Sesi Anda berakhir. Silakan masuk kembali.')
+  return user
+}
+
+/** PATCH /me versi mock: token diperbarui supaya nama baru bertahan saat halaman di-refresh. */
+export async function mockUpdateMe(patch: Partial<Pick<User, 'name' | 'avatar_url'>>): Promise<User> {
+  await wait(400)
+  const current = decodeMockToken()
+  if (!current) throw new ApiError(401, 'Sesi Anda berakhir. Silakan masuk kembali.')
+  const account = accounts.find((a) => a.id === current.id)
+  if (account) Object.assign(account, patch)
+  const user: User = { ...current, ...patch }
+  setToken(encode(user))
+  return user
 }

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import * as authApi from '../../api/auth'
 import { setUnauthorizedHandler } from '../../api/client'
 import { ApiError } from '../../api/errors'
+import { clearResourceCache } from '../../hooks/useResource'
 import { clearToken, getToken, setToken } from '../../lib/tokenStorage'
 import type { AuthPayload, User } from '../../types/api'
 
@@ -45,7 +46,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // AUTH-03: hapus token (cache TanStack Query ikut dibersihkan di sini saat sudah dipasang).
+  // AUTH-03: hapus token dan seluruh cache data.
   logout: async () => {
     try {
       await authApi.logout()
@@ -53,6 +54,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       /* token tetap dihapus di klien walau server gagal dihubungi */
     }
     clearToken()
+    clearResourceCache()
     set({ user: null, status: 'guest', notice: null })
   },
 
@@ -60,6 +62,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   expire: () => {
     const wasIn = get().status !== 'guest'
     clearToken()
+    clearResourceCache()
     set({ user: null, status: 'guest', notice: wasIn ? 'Sesi Anda berakhir. Silakan masuk kembali.' : null })
   },
 

@@ -1,8 +1,7 @@
 import type { ApiEnvelope, AuthPayload, LoginRequest, RegisterRequest, User } from '../types/api'
 import { api } from './client'
+import { useMock } from './mode'
 
-// Mock aktif otomatis di `npm run dev` selama backend belum siap. Tidak ikut ke bundle produksi.
-const useMock = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK !== 'false'
 const mock = () => import('../mocks/auth')
 
 export async function login(body: LoginRequest): Promise<AuthPayload> {

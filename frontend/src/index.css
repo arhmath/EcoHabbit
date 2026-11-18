@@ -24,3 +24,12 @@ html.lenis, html.lenis body { height: auto; }
 a:focus-visible, button:focus-visible { outline: 2px solid var(--color-mist); outline-offset: 3px; }
 /* Landing bertema terang: ring fokus harus gelap agar terlihat. */
 .theme-light a:focus-visible, .theme-light button:focus-visible { outline-color: var(--color-leaf); }
+
+/* Animasi masuk dari bawah, sama arahnya dengan transisi antar halaman. Jeda berurutan lewat --i. */
+@keyframes rise { from { opacity: 0; transform: translateY(2.5rem); } to { opacity: 1; transform: none; } }
+@keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes sweep { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.rise, .anim-rise { animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
+.grow { transform-box: fill-box; transform-origin: bottom; animation: grow 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 60ms + 300ms); }
+.sweep { transform-box: fill-box; transform-origin: left; animation: sweep 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms + 300ms); }
+@media (prefers-reduced-motion: reduce) { .rise, .anim-rise, .grow, .sweep { animation: none; } }

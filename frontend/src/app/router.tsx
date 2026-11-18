@@ -29,12 +29,29 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        element: <RequireAuth roles={['user']} />,
-        children: [{ path: '/dashboard', lazy: page(() => import('../features/dashboard/DashboardPage')) }],
-      },
-      {
-        element: <RequireAuth roles={['admin']} />,
-        children: [{ path: '/admin/dashboard', lazy: page(() => import('../features/admin/AdminDashboardPage')) }],
+        // Semua halaman setelah login berbagi satu kerangka (sidebar/menu bawah) agar tidak remount saat pindah menu.
+        element: <RequireAuth />,
+        children: [
+          {
+            lazy: page(() => import('./AppShell')),
+            children: [
+              {
+                element: <RequireAuth roles={['user']} />,
+                children: [
+                  { path: '/dashboard', lazy: page(() => import('../features/dashboard/DashboardPage')) },
+                  { path: '/challenges', lazy: page(() => import('../features/challenges/ChallengesPage')) },
+                  { path: '/scan', lazy: page(() => import('../features/scan/ScanPage')) },
+                  { path: '/leaderboard', lazy: page(() => import('../features/leaderboard/LeaderboardPage')) },
+                ],
+              },
+              {
+                element: <RequireAuth roles={['admin']} />,
+                children: [{ path: '/admin/dashboard', lazy: page(() => import('../features/admin/AdminDashboardPage')) }],
+              },
+              { path: '/profile', lazy: page(() => import('../features/profile/ProfilePage')) },
+            ],
+          },
+        ],
       },
       { path: '/403', element: <StatusPage code="403" title="Akses ditolak" body="Akunmu tidak memiliki izin untuk membuka halaman ini." /> },
       { path: '*', element: <StatusPage code="404" title="Halaman tidak ditemukan" body="Alamat yang kamu tuju tidak ada atau sudah dipindahkan." /> },

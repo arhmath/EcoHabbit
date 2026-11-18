@@ -9,6 +9,10 @@ const LABELS: Record<string, string> = {
   '/register': 'Daftar',
   '/dashboard': 'Dashboard',
   '/admin/dashboard': 'Panel admin',
+  '/challenges': 'Misi',
+  '/scan': 'Scan sampah',
+  '/leaderboard': 'Peringkat',
+  '/profile': 'Profil',
 }
 
 // Login <-> register sudah punya animasi panel geser sendiri di AuthPage.
