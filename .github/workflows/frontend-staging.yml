@@ -45,16 +45,32 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Cloudflare WARP for IPv6 Access
-        uses: s-acs/cloudflare-warp-action@v1
-        with:
-          mode: warp # Memberikan konektivitas dual-stack (IPv4 + IPv6)
-
-      - name: Verify IPv6 Connectivity
+      - name: Install and Start Cloudflare WARP (Proxy Mode)
         run: |
-          curl -6 -s --connect-timeout 5 https://ifconfig.co || true
+          curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
+          sudo apt-get update && sudo apt-get install -y cloudflare-warp netcat-openbsd
 
-      - name: Deploy to IPv6 Server via Native SSH
+          # Registrasi dan jalankan WARP dalam mode SOCKS5 proxy di port 40000
+          warp-cli --accept-tos registration new
+          warp-cli --accept-tos mode proxy
+          warp-cli --accept-tos proxy port 40000
+          warp-cli --accept-tos connect
+
+          # Tunggu sampai status WARP Connected (maksimal 15 detik)
+          for i in {1..15}; do
+            if warp-cli --accept-tos status | grep -q "Connected"; then
+              echo "WARP Connected!"
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Verify IPv6 via WARP Proxy
+        run: |
+          curl -6 -s --socks5-hostname 127.0.0.1:40000 --connect-timeout 10 https://ifconfig.co
+
+      - name: Deploy to IPv6 Server via SSH over WARP Proxy
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -66,16 +82,15 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -6 -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
-          ssh -6 -p "$SSH_PORT" -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" << EOF
+          ssh -p "$SSH_PORT" \
+            -o StrictHostKeyChecking=no \
+            -o ProxyCommand="nc -X 5 -x 127.0.0.1:40000 %h %p" \
+            "$SSH_USER@$SSH_HOST" << EOF
             set -e
             echo "$GITEA_TOKEN" | docker login $REGISTRY -u "$GITEA_USERNAME" --password-stdin
             docker pull $REGISTRY/$IMAGE_NAME:staging
             
             cd /opt/ecohabbit && docker compose up -d frontend
-            # Jika pakai K3s, uncomment baris di bawah dan hapus baris docker compose di atas:
-            # kubectl rollout restart deployment/ecohabbit-frontend -n staging
-            
             docker image prune -f
           EOF
