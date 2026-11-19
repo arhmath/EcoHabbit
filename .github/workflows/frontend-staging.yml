@@ -5,8 +5,8 @@ on:
     branches:
       - integration
     paths:
-      - 'frontend/**'
-      - '.github/workflows/frontend-staging.yml'
+      - "frontend/**"
+      - ".github/workflows/frontend-staging.yml"
 
 env:
   REGISTRY: gitea.labnya-aska.my.id
@@ -41,22 +41,41 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-  # deploy:
-  #   needs: build-and-push
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Deploy to Server via SSH
-  #       uses: appleboy/ssh-action@v1.2.0
-  #       with:
-  #         host: ${{ secrets.SSH_HOST }}
-  #         username: ${{ secrets.SSH_USER }}
-  #         key: ${{ secrets.SSH_PRIVATE_KEY }}
-  #         script: |
-  #           echo "${{ secrets.GITEA_TOKEN }}" | docker login ${{ env.REGISTRY }} -u "${{ secrets.GITEA_USERNAME }}" --password-stdin
-  #           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging
-  #           
-  #           # Ganti baris di bawah sesuai orchestrator kamu (Docker Compose atau K3s)
-  #           cd /opt/ecohabbit && docker compose up -d frontend
-  #           # kubectl rollout restart deployment/ecohabbit-frontend -n staging
-  #           
-  #           docker image prune -f
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Cloudflare WARP for IPv6 Access
+        uses: s-acs/cloudflare-warp-action@v1
+        with:
+          mode: warp # Memberikan konektivitas dual-stack (IPv4 + IPv6)
+
+      - name: Verify IPv6 Connectivity
+        run: |
+          curl -6 -s --connect-timeout 5 https://ifconfig.co || true
+
+      - name: Deploy to IPv6 Server via Native SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+          GITEA_USERNAME: ${{ secrets.GITEA_USERNAME }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -6 -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          ssh -6 -p "$SSH_PORT" -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" << EOF
+            set -e
+            echo "$GITEA_TOKEN" | docker login $REGISTRY -u "$GITEA_USERNAME" --password-stdin
+            docker pull $REGISTRY/$IMAGE_NAME:staging
+            
+            cd /opt/ecohabbit && docker compose up -d frontend
+            # Jika pakai K3s, uncomment baris di bawah dan hapus baris docker compose di atas:
+            # kubectl rollout restart deployment/ecohabbit-frontend -n staging
+            
+            docker image prune -f
+          EOF
