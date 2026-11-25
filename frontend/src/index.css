@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #051f20;
+  --color-forest-900: #0b2b26;
+  --color-forest-800: #163832;
+  --color-forest-700: #235347;
+  --color-sage: #8eb69b;
+  --color-mist: #daf1de;
+  --color-leaf: #0b4a3a;
+  --color-leaf-600: #14604a;
+  --color-zest: #c6f26b;
+  --color-zest-soft: #e2f9ae;
+  --color-paper: #e6e6e4;
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+html { background: var(--color-ink); color: var(--color-mist); }
+body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+::selection { background: var(--color-sage); color: var(--color-ink); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--color-mist); outline-offset: 3px; }
+/* Landing bertema terang: ring fokus harus gelap agar terlihat. */
+.theme-light a:focus-visible, .theme-light button:focus-visible { outline-color: var(--color-leaf); }
+
+/* Animasi masuk dari bawah, sama arahnya dengan transisi antar halaman. Jeda berurutan lewat --i. */
+@keyframes rise { from { opacity: 0; transform: translateY(2.5rem); } to { opacity: 1; transform: none; } }
+@keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes sweep { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.rise, .anim-rise { animation: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
+.grow { transform-box: fill-box; transform-origin: bottom; animation: grow 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 60ms + 300ms); }
+.sweep { transform-box: fill-box; transform-origin: left; animation: sweep 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms + 300ms); }
+@media (prefers-reduced-motion: reduce) { .rise, .anim-rise, .grow, .sweep { animation: none; } }
