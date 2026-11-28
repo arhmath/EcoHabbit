@@ -1,0 +1,65 @@
+{
+  "info": {
+    "name": "EcoHabit API - Auth & Profil",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api/v1" },
+    { "key": "token", "value": "" }
+  ],
+  "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ] },
+  "item": [
+    {
+      "name": "Register",
+      "auth": { "type": "noauth" },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "const j = pm.response.json(); if (j.data && j.data.token) pm.collectionVariables.set('token', j.data.token);"
+      ] } } ],
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Accept", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Budi\",\n  \"email\": \"budi@example.com\",\n  \"password\": \"Rahasia123\",\n  \"password_confirmation\": \"Rahasia123\"\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{base_url}}/register"
+      }
+    },
+    {
+      "name": "Login",
+      "auth": { "type": "noauth" },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
+        "const j = pm.response.json(); if (j.data && j.data.token) pm.collectionVariables.set('token', j.data.token);"
+      ] } } ],
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Accept", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@ecohabit.test\",\n  \"password\": \"ISI_PASSWORD_ADMIN\"\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{base_url}}/login"
+      }
+    },
+    { "name": "Me", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": "{{base_url}}/me" } },
+    { "name": "Logout (perangkat ini)", "request": { "method": "POST", "header": [ { "key": "Accept", "value": "application/json" } ], "url": "{{base_url}}/logout" } },
+    { "name": "Logout semua perangkat", "request": { "method": "POST", "header": [ { "key": "Accept", "value": "application/json" } ], "url": "{{base_url}}/logout-all" } },
+    { "name": "Profil - lihat", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": "{{base_url}}/profile" } },
+    {
+      "name": "Profil - ubah (nama/email/avatar)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Accept", "value": "application/json" } ],
+        "body": { "mode": "formdata", "formdata": [
+          { "key": "name", "value": "Budi Baru", "type": "text" },
+          { "key": "avatar", "type": "file", "src": [] }
+        ] },
+        "url": "{{base_url}}/profile"
+      }
+    },
+    {
+      "name": "Profil - ganti password",
+      "request": {
+        "method": "PUT",
+        "header": [ { "key": "Accept", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"current_password\": \"Rahasia123\",\n  \"password\": \"BaruBaru123\",\n  \"password_confirmation\": \"BaruBaru123\"\n}", "options": { "raw": { "language": "json" } } },
+        "url": "{{base_url}}/profile/password"
+      }
+    },
+    { "name": "Admin - ping (uji RBAC)", "request": { "method": "GET", "header": [ { "key": "Accept", "value": "application/json" } ], "url": "{{base_url}}/admin/ping" } }
+  ]
+}
